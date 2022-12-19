@@ -1,0 +1,16 @@
+pipeline {
+  // Declare the variables for the pipeline A that you want to invoke
+  agent any
+  environment{
+        def pipelineA = 'job-B'
+        def buildNumber = '123'
+  }
+  stages {
+    stage('Invoke Pipeline A') {
+      steps {
+        // Use the build step to invoke pipeline A asynchronously
+        build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER', value: "${env.buildNumber}")], wait: false
+      }
+    }
+  }
+}
