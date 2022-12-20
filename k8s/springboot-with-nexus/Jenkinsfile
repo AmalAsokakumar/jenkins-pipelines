@@ -80,11 +80,9 @@ pipeline{
                         helmVersion=$(helm show chart ./helm/helmchart | grep version: | cut -d ":" -f2 | tr -d " ")
                         tar -czvf myapp-${helmVersion}.tgz helm/
                         ls -lsh
-                        
-                    
+                        tar xvf myapp-${helmVersion}.tgz
                     '''
                     //tar -tvf myapp-${helmVersion}.tar
-                    
                     // dir('./helm/') {// this sed needs to be changed in a way that using this we need to get the version from Chart.yaml file.
                     // sh 'helmVersion=$(helm show chart ./helm/helmchart | grep version: | cut -d ":" -f2 | tr -d " ")'
                     // echo " helm version is ${helmVersion}"
