@@ -3,9 +3,10 @@ pipeline{
     tools{
         maven "maven"
     }
-    // environment{
-    //     // helmVersion = ' '
-    // }
+    environment{
+            def pipelineA = 'k8sDeployment'
+            def buildNumber = '123'
+    }
         stages{
             stage ('SCM checkout'){
                 steps{ 
@@ -70,7 +71,7 @@ pipeline{
                     }
                 }
             }
-            stage('changing the Helm chart version & buildinf helm artifact'){
+            stage('Building Helm artifact, versioning it and pushing it in to Nexus'){
                 steps{
                     sh'''
                         chmod 777 helm
@@ -103,6 +104,12 @@ pipeline{
                     // tar tvf myapp-${helmVersion}.tar
                     // '''
 
+                }
+            }
+            stage('triggering the Downstream job for Deploying'){
+                steps{
+                    // Use the build step to invoke pipeline A asynchronously
+                    build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER', value: "${env.buildNumber}")], wait: false
                 }
             }
         }
