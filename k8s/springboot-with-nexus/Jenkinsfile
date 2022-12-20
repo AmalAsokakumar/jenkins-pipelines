@@ -77,7 +77,7 @@ pipeline{
                         }
                     sh '''
                     tar -czvf myapp-${helmversion}.tgz helm/
-                    ls - l
+                    ls -l
                     '''
                 }
             }
