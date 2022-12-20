@@ -5,7 +5,7 @@ pipeline{
     }
     environment{
             def pipelineA = 'k8sDeployment'
-            def buildNumber = '123'
+            def buildNumber = $BUILD_NUMBER
     }
         stages{
             stage ('SCM checkout'){
