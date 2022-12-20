@@ -89,7 +89,7 @@ pipeline{
                     sh '''
                     pwd 
                     tar -cvf myapp:$helmVersion.tar helm/
-                    tar -tvf myapp:${helmVersion}.tar
+                    tar tvf myapp:${helmVersion}.tar
                     ls -l
                     '''
                     // withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
