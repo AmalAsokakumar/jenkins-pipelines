@@ -84,7 +84,7 @@ pipeline{
                     '''
                     withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
                         sh '''
-                            curl -u admin:$nexus_password http://18.188.220.54:8081/repository/helm-hosted/ --upload-file myapp*.tgz -v
+                            curl -u admin:$password http://18.188.220.54:8081/repository/helm-hosted/ --upload-file myapp*.tgz -v
                         '''
                     }
                     //tar -tvf myapp-${helmVersion}.tar
