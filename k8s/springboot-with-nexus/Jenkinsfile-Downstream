@@ -1,0 +1,19 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'BUILD_NUMBER_', defaultValue: '', description: 'Build number to use')
+    }
+    stages {
+        stage('Pulling the Artifact') {
+            steps {
+                echo "Build number: $params.BUILD_NUMBER_"
+                    withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
+                        sh '''
+                            docker login -u admin -p $password 18.188.220.54:8083
+                            docker pull 18.188.220.54:8083//maven-app:$BUILD_NUMBER
+                        '''
+                    }
+            }
+        }
+    }
+}
