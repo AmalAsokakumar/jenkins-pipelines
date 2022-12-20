@@ -12,74 +12,74 @@ pipeline{
                     git branch: 'Devops', url: 'https://github.com/comrider/springboot-app.git'
                 }
             }
-            stage("build & SonarQube analysis"){
-                steps{
-                    withSonarQubeEnv('sonarqube') {
-                        sh 'mvn clean package sonar:sonar'
-                    }
-                }
-            }
-            stage("Quality Gate") {
-                steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-                }
-            }
-            stage('unit test'){
-                steps{
-                    sh 'mvn test'
-                }
-            }
-            stage('integration test'){
-                steps {
-                    sh 'mvn verify  -DskipUnitTests'
-                }
-            }
-            stage('code analysis with checkstyle'){
-                steps{
-                    sh 'mvn checkstyle:checkstyle'
-                }
-                post {
-                    success{
-                        echo "Generated Analysis Result"
-                    }
-                }
-            }
-            stage("Maven Packaging"){
-            steps{
-            sh 'mvn package'
-            }
-            }
-            stage("Build Image") {
-                steps{
-                    echo 'building docker image '
-                    sh 'docker build -t 18.188.220.54:8083/maven-app:$BUILD_NUMBER .'
-                    echo 'doker login '
-                }
-            }
-            stage('Pushing the image to Nexus'){
-                steps{
-                    withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
-                        sh '''
-                            docker login -u admin -p $password 18.188.220.54:8083
-                            docker push 18.188.220.54:8083/maven-app:$BUILD_NUMBER
-                            docker rmi 18.188.220.54:8083/maven-app:$BUILD_NUMBER
-                        '''
-                    }
-                }
-            }
+            // stage("build & SonarQube analysis"){
+            //     steps{
+            //         withSonarQubeEnv('sonarqube') {
+            //             sh 'mvn clean package sonar:sonar'
+            //         }
+            //     }
+            // }
+            // stage("Quality Gate") {
+            //     steps {
+            //     timeout(time: 5, unit: 'MINUTES') {
+            //         waitForQualityGate abortPipeline: true
+            //     }
+            //     }
+            // }
+            // stage('unit test'){
+            //     steps{
+            //         sh 'mvn test'
+            //     }
+            // }
+            // stage('integration test'){
+            //     steps {
+            //         sh 'mvn verify  -DskipUnitTests'
+            //     }
+            // }
+            // stage('code analysis with checkstyle'){
+            //     steps{
+            //         sh 'mvn checkstyle:checkstyle'
+            //     }
+            //     post {
+            //         success{
+            //             echo "Generated Analysis Result"
+            //         }
+            //     }
+            // }
+            // stage("Maven Packaging"){
+            //     steps{
+            //     sh 'mvn package'
+            //     }
+            // }
+            // stage("Build Image") {
+            //     steps{
+            //         echo 'building docker image '
+            //         sh 'docker build -t 18.188.220.54:8083/maven-app:$BUILD_NUMBER .'
+            //         echo 'doker login '
+            //     }
+            // }
+            // stage('Pushing the image to Nexus'){
+            //     steps{
+            //         withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
+            //             sh '''
+            //                 docker login -u admin -p $password 18.188.220.54:8083
+            //                 docker push 18.188.220.54:8083/maven-app:$BUILD_NUMBER
+            //                 docker rmi 18.188.220.54:8083/maven-app:$BUILD_NUMBER
+            //             '''
+            //         }
+            //     }
+            // }
             stage('changing the Helm chart version & buildinf helm artifact'){
                 steps{
                     dir('./helm/') {// this sed needs to be changed in a way that using this we need to get the version from Chart.yaml file.
-                            sh 'helmVersion=$(helm show chart ./helmchart | grep version: | cut -d: -f2 | tr -d " ")'
-                            echo 'helmVersion${helmVersion}'
+                            sh 'env.helmVersion=$(helm show chart ./helmchart | grep version: | cut -d: -f2 | tr -d " ")'
+                            echo 'helmVersion${env.helmVersion}'
                                 // sed 's/version:.*/version: $BUILD_NUMBER/' Chart.yaml > changed.txt && mv changed.txt Chart.yaml
                                 // cat Chart.yaml
                         }
                     sh '''
                     pwd 
-                    tar -czvf myapp-${helmVersion}.tgz helm/
+                    tar -czvf myapp-${env.helmVersion}.tgz helm/
                     ls -l
                     '''
                 }
@@ -88,7 +88,7 @@ pipeline{
                 steps{
                     withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
                         sh '''
-                            curl -u admin:$nexus_password http://18.188.220.54:8081/repository/helm-hosted/ --upload-file myapp-${helmVersion}.tgz -v
+                            curl -u admin:$nexus_password http://18.188.220.54:8081/repository/helm-hosted/ --upload-file myapp-${env.helmVersion}.tgz -v
                         '''
                     }
                 }
