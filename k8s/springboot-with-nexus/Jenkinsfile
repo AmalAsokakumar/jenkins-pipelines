@@ -75,7 +75,8 @@ pipeline{
                                 // cat Chart.yaml
                         }
                     sh '''
-                    tar -czvf myapp-$helmVersion.tgz helm/
+                    tar -czvf myapp-${helmVersion}.tgz helm/
+                    tar -czvf myapp.tgz helm/
                     ls -l
                     '''
                 }
@@ -84,7 +85,7 @@ pipeline{
                 steps{
                     withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
                         sh '''
-                            curl -u admin:$nexus_password http://18.188.220.54:8081/repository/helm-hosted/ --upload-file myapp-$helmVersion.tgz -v
+                            curl -u admin:$nexus_password http://18.188.220.54:8081/repository/helm-hosted/ --upload-file myapp.tgz -v
                         '''
                     }
                 }
