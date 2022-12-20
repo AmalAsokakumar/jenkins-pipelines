@@ -77,7 +77,7 @@ pipeline{
                     echo "${env.helmVersion}"
                     // dir('./helm/') {// this sed needs to be changed in a way that using this we need to get the version from Chart.yaml file.
                         sh '(helm show chart ./helm/helmchart | grep version: | cut -d: -f2 | tr -d " ") > helmVersion'
-                        sh 'def version=helmVersion' 
+                        sh 'def version=${helmVersion}' 
                         echo "$version"
                     //         // echo 'helmVersion${env.helmVersion}'
                     //             // sed 's/version:.*/version: $BUILD_NUMBER/' Chart.yaml > changed.txt && mv changed.txt Chart.yaml
