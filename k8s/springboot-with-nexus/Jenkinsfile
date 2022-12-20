@@ -3,9 +3,9 @@ pipeline{
     tools{
         maven "maven"
     }
-    environment{
-        // helmVersion = ' '
-    }
+    // environment{
+    //     // helmVersion = ' '
+    // }
         stages{
             stage ('SCM checkout'){
                 steps{
