@@ -8,7 +8,8 @@ pipeline{
     // }
         stages{
             stage ('SCM checkout'){
-                steps{
+                steps{ 
+                    cleanWs()
                     git branch: 'Devops', url: 'https://github.com/comrider/springboot-app.git'
                 }
             }
