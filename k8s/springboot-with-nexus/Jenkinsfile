@@ -74,17 +74,18 @@ pipeline{
                    helmVersion=sh'$(helm show chart helm/helmchart | grep version: | cut -d: -f2 | tr -d " ")'
                 }
                 steps{
+                    echo "${env.helmVersion}"
                     // dir('./helm/') {// this sed needs to be changed in a way that using this we need to get the version from Chart.yaml file.
                     //         sh 'env.helmVersion=$(helm show chart ./helmchart | grep version: | cut -d: -f2 | tr -d " ")'
                     //         // echo 'helmVersion${env.helmVersion}'
                     //             // sed 's/version:.*/version: $BUILD_NUMBER/' Chart.yaml > changed.txt && mv changed.txt Chart.yaml
                     //             // cat Chart.yaml
                     //     }
-                    sh '''
-                    pwd 
-                    tar -czvf myapp-${env.helmVersion}.tgz helm/
-                    ls -l
-                    '''
+                    // sh '''
+                    // pwd 
+                    // tar -czvf myapp-${env.helmVersion}.tgz helm/
+                    // ls -l
+                    // '''
                     // withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
                     //     sh '''
                     //         curl -u admin:$nexus_password http://18.188.220.54:8081/repository/helm-hosted/ --upload-file myapp-${env.helmVersion}.tgz -v
