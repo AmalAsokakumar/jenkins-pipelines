@@ -72,7 +72,9 @@ pipeline{
             stage('changing the Helm chart version & buildinf helm artifact'){
                 steps{
                     sh'''
+                        chmod 777 helm
                         tar -czvf test.tgz helm/
+                        chomd 777 test.tgz
                         // helmVersion=$(helm show chart ./helm/helmchart | grep version: | cut -d ":" -f2 | tr -d " ")
                         // tar -czvf myapp-$helmVersion.tgz helm/
                         // tar -tvf myapp-${helmVersion}.tar
