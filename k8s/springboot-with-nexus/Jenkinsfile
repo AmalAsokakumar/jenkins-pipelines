@@ -62,16 +62,15 @@ pipeline{
                             docker login -u admin -p $password 18.188.220.54:8083
                             docker push 18.188.220.54:8083/maven-app:$BUILD_NUMBER
                             docker rmi 18.188.220.54:8083/maven-app:$BUILD_NUMBER
-                            docker logout 
                         '''
                     }
                 }
             }
             stage('changing the Helm chart version & buildinf helm artifact'){
                 steps{
-                    dir('./helm/helmchart/') {// this sed needs to be changed in a way that using this we need to get the version from Chart.yaml file.
+                    dir('./helm/') {// this sed needs to be changed in a way that using this we need to get the version from Chart.yaml file.
                             sh 'helmversion=$(helm show chart ./helmchart | grep version: | cut -d: -f2 | tr -d " ")'
-                            echo '$helmVersion'
+                            echo 'helm version : $helmVersion'
                                 // sed 's/version:.*/version: $BUILD_NUMBER/' Chart.yaml > changed.txt && mv changed.txt Chart.yaml
                                 // cat Chart.yaml
                         }
