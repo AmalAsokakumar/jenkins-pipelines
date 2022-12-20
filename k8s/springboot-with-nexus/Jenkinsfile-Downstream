@@ -11,8 +11,25 @@ pipeline {
                         sh '''
                             docker login -u admin -p $password 18.188.220.54:8083
                             docker pull 18.188.220.54:8083/maven-app:$BUILD_NUMBER_
+                            curl -u admin:$password -O http://18.188.220.54:8081/repository/helm-hosted/myapp*.tgz
                         '''
                     }
+            }
+        }
+        stage('Extracting the files'){
+            step{
+                sh '''
+                    tar xvf myapp-${helmVersion}.tgz
+                    ls -lrsh 
+                '''
+            }
+        }
+        stage('Editing the image version'){
+            step{
+                sh '''
+                    helm template -f helm/deployment.yaml helm/helmchart
+                    helm lint -f helm/deployment.yaml helm/helmchart
+                '''
             }
         }
     }
