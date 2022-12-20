@@ -86,13 +86,13 @@ pipeline{
                     //             // sed 's/version:.*/version: $BUILD_NUMBER/' Chart.yaml > changed.txt && mv changed.txt Chart.yaml
                     //             // cat Chart.yaml
                     //     }
-                    sh '''
-                    pwd
-                    ls -l 
-                    tar -cvf myapp-$helmVersion.tar helm/
-                    ls -l
-                    tar tvf myapp-${helmVersion}.tar
-                    '''
+                    // sh '''
+                    // pwd
+                    // ls -l 
+                    // tar -cvf myapp-$helmVersion.tar helm/
+                    // ls -l
+                    // tar tvf myapp-${helmVersion}.tar
+                    // '''
                     // withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
                     //     sh '''
                     //         curl -u admin:$nexus_password http://18.188.220.54:8081/repository/helm-hosted/ --upload-file myapp-${env.helmVersion}.tgz -v
