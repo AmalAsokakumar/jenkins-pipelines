@@ -93,7 +93,7 @@ pipeline{
             stage('triggering the Downstream job for Deploying'){
                 steps{
                     // Use the build step to invoke pipeline A asynchronously//
-                    build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER', value: "$BUILD_NUMBER")], wait: false
+                    build job: "${env.pipelineA}", parameters: [string(name: '$BUILD_NUMBER', value: "$BUILD_NUMBER")], wait: false
                 }
             }
         }
