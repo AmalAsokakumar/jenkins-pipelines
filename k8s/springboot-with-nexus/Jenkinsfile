@@ -83,9 +83,9 @@ pipeline{
                             ls -lsh
                             tar xvf myapp-${helmVersion}.tgz
                             curl -u admin:$password http://18.188.220.54:8081/repository/helm-hosted/ --upload-file myapp-${helmVersion}.tgz -v
-                            APPVERSION=$helmVersion
+                            env.APPVERSION=$helmVersion
                         '''
-                        echo " this step is to test weathe this line is executing or not,$APPVERSION"
+                        echo " this step is to test weathe this line is executing or not,${env.APPVERSION}"
                     }
                 }
             }
