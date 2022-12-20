@@ -77,7 +77,6 @@ pipeline{
                         sh '''
                             chmod 777 helm
                             tar -czvf test.tgz helm/
-                            ls -lsh
                             tar -tvf test.tgz
                             helmVersion=$(helm show chart ./helm/helmchart | grep version: | cut -d ":" -f2 | tr -d " ")
                             tar -czvf myapp-${helmVersion}.tgz helm/
@@ -86,7 +85,7 @@ pipeline{
                             curl -u admin:$password http://18.188.220.54:8081/repository/helm-hosted/ --upload-file myapp-${helmVersion}.tgz -v
                             appVersion=$helmVersion
                         '''
-                        echo "APPVERSION=$appVersion"
+                        echo " this step is to test weathe this line is executing or not, APPVERSION=$appVersion"
                     }
                 }
             }
