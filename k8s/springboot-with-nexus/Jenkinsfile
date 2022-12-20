@@ -5,7 +5,7 @@ pipeline{
     }
     environment{
             def pipelineA = 'k8sDeployment'
-            //def buildNumber = '100'
+            def APPVERSION = ''
     }
         stages{
             stage ('SCM checkout'){
@@ -84,14 +84,16 @@ pipeline{
                             ls -lsh
                             tar xvf myapp-${helmVersion}.tgz
                             curl -u admin:$password http://18.188.220.54:8081/repository/helm-hosted/ --upload-file myapp-${helmVersion}.tgz -v
+                            appVersion=$helmVersion
                         '''
+                        echo "APPVERSION=$appVersion"
                     }
                 }
             }
             stage('triggering the Downstream job for Deploying'){
                 steps{
                     // Use the build step to invoke pipeline A asynchronously//
-                    build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}")], wait: false
+                    build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}"), string(name: 'APPVERSION', value: '${appVersion}')], wait: false
                 }
             }
         }

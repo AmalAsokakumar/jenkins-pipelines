@@ -1,7 +1,8 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'BUILD_NUMBER_', defaultValue: '', description: 'Build number to use')
+        string(name: 'BUILD_NUMBER_', defaultValue: '', description: 'To version the docker image')
+        string(name: 'APPVERSION', defaultValue: '', description: 'To version helm image' )
     }
     stages {
         stage('Pulling the Artifact') {
