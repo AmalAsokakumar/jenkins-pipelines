@@ -10,7 +10,7 @@ pipeline {
                     withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
                         sh '''
                             docker login -u admin -p $password 18.188.220.54:8083
-                            docker pull 18.188.220.54:8083//maven-app:$BUILD_NUMBER
+                            docker pull 18.188.220.54:8083/maven-app:$BUILD_NUMBER_
                         '''
                     }
             }
