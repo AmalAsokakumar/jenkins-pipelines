@@ -73,7 +73,7 @@ pipeline{
                 steps{
                     dir('./helm/') {// this sed needs to be changed in a way that using this we need to get the version from Chart.yaml file.
                             sh 'helmVersion = $(helm show chart ./helmchart | grep version: | cut -d: -f2 | tr -d " ")'
-                            echo 'helm version : ${helmVersion}'
+                            echo 'helmVersion : ${helmVersion}'
                                 // sed 's/version:.*/version: $BUILD_NUMBER/' Chart.yaml > changed.txt && mv changed.txt Chart.yaml
                                 // cat Chart.yaml
                         }
@@ -88,7 +88,7 @@ pipeline{
                 steps{
                     withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
                         sh '''
-                            curl -u admin:$nexus_password http://18.188.220.54:8081/repository/helm-hosted/ --upload-file myapp.tgz -v
+                            curl -u admin:$nexus_password http://18.188.220.54:8081/repository/helm-hosted/ --upload-file myapp-${helmVersion}.tgz -v
                         '''
                     }
                 }
