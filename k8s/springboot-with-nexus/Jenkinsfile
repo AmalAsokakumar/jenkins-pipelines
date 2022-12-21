@@ -107,12 +107,12 @@ pipeline{
             //         }
             //     }
             // }
-            stage('Versioning and building nexus artifact, pusing it into Nexus'){
+            stage('Versioning and building nexus artifact, pusing it into ECR'){
                 steps{
                     sh '''
-                        sed 's/version:.*/version: $BUILD_NUMBER/' helm/helmchart/Chart.yaml
+                        sed 's/version:.*/version: ${BUILD_NUMBER}/' helm/helmchart/Chart.yaml
                         helm package helm/helmchart
-                        helm push helm-test-chart-0.1.0.tgz oci://public.ecr.aws/z2t0b6v5/spring-boot/:$BUILD_NUMBER
+                        helm push helmchart.*.tgz oci://public.ecr.aws/z2t0b6v5/spring-boot/:$BUILD_NUMBER
                     '''
                 }
             }
