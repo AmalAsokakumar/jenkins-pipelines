@@ -111,7 +111,7 @@ pipeline{
                 steps{
                     sh '''
                         sed -i "s/version:.*/version: $BUILD_NUMBER/" helm/helmcharts/Chart.yaml
-                        cat ./helmcharts/Chart.yaml
+                        cat ./helm/helmcharts/Chart.yaml
                         helm package helm/helmcharts
                         ls -lrt
                     '''
