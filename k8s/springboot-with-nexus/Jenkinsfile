@@ -120,7 +120,7 @@ pipeline{
                 steps{
                     sh '''
                         aws ecr-public get-login-password \
-                                --region us-east-2 | helm registry login \
+                                --region us-east-1 | helm registry login \
                                 --username AWS \
                                 --password-stdin public.ecr.aws/z2t0b6v5/helmchart
                     '''
@@ -128,7 +128,7 @@ pipeline{
                     sh '''
                         aws ecr-public describe-images \
                                 --repository-name helmchart \
-                                --region us-east-2
+                                --region us-east-1
                     '''
                 }
             }
