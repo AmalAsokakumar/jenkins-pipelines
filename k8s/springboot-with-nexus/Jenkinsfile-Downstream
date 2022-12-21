@@ -22,8 +22,11 @@ pipeline {
         stage('Extracting the files'){
             steps{
                 sh '''
-                    helm install --name test_deployment --dry-run helmchart-1-0.1.0.tgz
-                    helm install helmchart-1-0.1.0.tgz --debug
+                    tar tvf helmchart-1-0.1.0.tgz
+                    tar xvf helmchart-1-0.1.0.tgz
+                    helm template -f helmchart-1/value.yaml  helmchart-1
+                    helm lint -f helmchart-1/value.yaml  helmchart-1 
+                    helm install -f helmchart-1/value.yaml  helmchart-1 --debug
                 '''
                 // sh '''
                 //     file myapp-${params.APPVERSION}.tgz 
