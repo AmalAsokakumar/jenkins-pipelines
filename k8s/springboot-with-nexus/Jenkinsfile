@@ -111,7 +111,9 @@ pipeline{
                 steps{
                     sh '''
                         sed -i "s/version:.*/version: $BUILD_NUMBER/" helm/helmcharts/Chart.yaml
+                        cat ./helmcharts/Chart.yaml
                         helm package helm/helmcharts
+                        ls -lrt
                     '''
                     // helm push helmchart-1-$BUILD_NUMBER.tgz oci://public.ecr.aws/z2t0b6v5/helm/
                 }
@@ -124,7 +126,7 @@ pipeline{
                                 --username AWS \
                                 --password-stdin 345325264898.dkr.ecr.us-east-1.amazonaws.com
                     '''
-                    sh ' helm push helmcharts-1-$BUILD_NUMBER.tgz oci://345325264898.dkr.ecr.us-east-1.amazonaws.com'
+                    sh ' helm push helmcharts-$BUILD_NUMBER.tgz oci://345325264898.dkr.ecr.us-east-1.amazonaws.com'
 
                 }
             }
