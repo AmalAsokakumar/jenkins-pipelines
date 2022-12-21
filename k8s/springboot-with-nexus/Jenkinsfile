@@ -124,7 +124,7 @@ pipeline{
                                 --username AWS \
                                 --password-stdin public.ecr.aws/z2t0b6v5/helmchart
                     '''
-                    sh ' helm push helmchart-1-$BUILD_NUMBER.tgz oci://public.ecr.aws/z2t0b6v5/helmchart 
+                    sh ' helm push helmchart-1-$BUILD_NUMBER.tgz oci://public.ecr.aws/z2t0b6v5/helmchart' 
                     sh '''
                         aws ecr-public describe-images \
                                 --repository-name helmchart \
