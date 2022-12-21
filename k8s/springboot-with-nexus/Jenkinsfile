@@ -74,26 +74,27 @@ pipeline{
             stage('Building Helm artifact, versioning it and pushing it in to Nexus'){
                 steps{
                     withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
-                        sh '''
-                            chmod 777 helm
-                            tar -czvf test.tgz helm/
-                            tar -tvf test.tgz
-                            helmVersion=$(helm show chart ./helm/helmchart | grep version: | cut -d ":" -f2 | tr -d " ")
-                            tar -czvf myapp-${helmVersion}.tgz helm/
-                            ls -lsh
-                            tar xvf myapp-${helmVersion}.tgz
-                            curl -u admin:$password http://18.188.220.54:8081/repository/helm-repo/ --upload-file myapp-${helmVersion}.tgz -v
-                        '''
-                        //  echo "APPVERSION=$helmVersion"
-                        // echo " this step is to test weathe this line is executing or not,${env.APPVERSION}"
+                    sh "helm package helm/helmchart/ "
+                    curl -u admin:$password http://18.188.220.54:8081/repository/helm-repo/ --upload-file helm-repo-0.1.0.tgz -v
+                        // sh '''
+                        //     chmod 777 helm
+                        //     tar -czvf test.tgz helm/
+                        //     tar -tvf test.tgz
+                        //     helmVersion=$(helm show chart ./helm/helmchart | grep version: | cut -d ":" -f2 | tr -d " ")
+                        //     tar -czvf myapp-${helmVersion}.tgz helm/
+                        //     ls -lsh
+                        //     tar xvf myapp-${helmVersion}.tgz
+                        //     curl -u admin:$password http://18.188.220.54:8081/repository/helm-repo/ --upload-file myapp-${helmVersion}.tgz -v
+                        // '''
                     }
                 }
             }
-            // stage('triggering the Downstream job for Deploying'){
-            //     steps{
-            //         // Use the build step to invoke pipeline A asynchronously//
-            //         build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}"), string(name: 'APPVERSION', value: '${appVersion}')], wait: false
-            //     }
-            // }
+            stage('triggering the Downstream job for Deploying'){
+                steps{
+                    // Use the build step to invoke pipeline A asynchronously//
+                    build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}")], wait: false
+                    // build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}"), string(name: 'APPVERSION', value: '${appVersion}')], wait: false
+                }
+            }
         }
     }

@@ -2,19 +2,19 @@ pipeline {
     agent any
     parameters {
         string(name: 'BUILD_NUMBER_', defaultValue: '', description: 'To version the docker image')
-        string(name: 'APPVERSION', defaultValue: 'error', description: 'To version helm image' )
+        // string(name: 'APPVERSION', defaultValue: 'error', description: 'To version helm image' )
     }
     stages {
         stage('Pulling the Artifact') {
             steps {
                 cleanWs()
                 echo "Build number: $params.BUILD_NUMBER_"
-                echo "Helm version: $params.APPVERSION"
+                // echo "Helm version: $params.APPVERSION"
                     withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
                         sh '''
                             docker login -u admin -p $password 18.188.220.54:8083
                             docker pull 18.188.220.54:8083/maven-app:$BUILD_NUMBER_
-                            curl -u admin:$password -O http://18.188.220.54:8081/repository/helm-hosted/myapp-${params.APPVERSION}.tgz 
+                            curl -u admin:$password -O http://18.188.220.54:8081/repository/helm-hosted/helm-repo-0.1.0.tgz
                         '''
                     }
             }
@@ -22,21 +22,25 @@ pipeline {
         stage('Extracting the files'){
             steps{
                 sh '''
-                    file myapp-${params.APPVERSION}.tgz 
-                    ls -lrsh 
-                    tar xvf myapp-${params.APPVERSION}.tgz 
-                    ls -lrsh 
+                    helm install --dry-run mychart-0.1.0.tgz
+                    helm install mychart-0.1.0.tgz --debug
                 '''
-            }
-        }
-        stage('Editing the image version'){
-            steps{
-                echo "testing"
                 // sh '''
-                //     helm template -f helm/deployment.yaml helm/helmchart
-                //     helm lint -f helm/deployment.yaml helm/helmchart
+                //     file myapp-${params.APPVERSION}.tgz 
+                //     ls -lrsh 
+                //     tar xvf myapp-${params.APPVERSION}.tgz 
+                //     ls -lrsh 
                 // '''
             }
         }
+        // stage('Editing the image version'){
+        //     steps{
+        //         echo "testing"
+        //         // sh '''
+        //         //     helm template -f helm/deployment.yaml helm/helmchart
+        //         //     helm lint -f helm/deployment.yaml helm/helmchart
+        //         // '''
+        //     }
+        // }
     }
 }
