@@ -87,15 +87,6 @@ pipeline{
                     '''
                 }
             }
-            stage('Discribing the details of the repository'){
-                steps{
-                    sh '''
-                        aws ecr describe-images \
-                            --repository-name spring-boot \
-                            --region us-east-2
-                    '''
-                }
-            }
             // stage('Building Helm artifact, versioning it and pushing it in to Nexus'){
             //     steps{
             //         withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
