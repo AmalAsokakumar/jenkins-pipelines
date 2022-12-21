@@ -112,11 +112,24 @@ pipeline{
                     sh '''
                         sed -i "s/version:.*/version: $BUILD_NUMBER/" helm/helmchart/Chart.yaml
                         helm package helm/helmchart
-                        docker tag helmchart-1-$BUILD_NUMBER.tgz public.ecr.aws/z2t0b6v5/helmchart-1-$BUILD_NUMBER
-                        docker push public.ecr.aws/z2t0b6v5/helmchart-1-$BUILD_NUMBER
-                        
                     '''
                     // helm push helmchart-1-$BUILD_NUMBER.tgz oci://public.ecr.aws/z2t0b6v5/helm/
+                }
+            }
+            stage('Pushing Helm package into ECR'){
+                steps{
+                    sh '''
+                        aws ecr-public get-login-password \
+                                --region us-east-2 | helm registry login \
+                                --username AWS \
+                                --password-stdin public.ecr.aws/z2t0b6v5/helmchart
+                    '''
+                    sh ' helm push helmchart-1-$BUILD_NUMBER.tgz oci://public.ecr.aws/z2t0b6v5/helmchart-1-$BUILD_NUMBER'
+                    sh '''
+                        aws ecr-public describe-images \
+                                --repository-name helmchart \
+                                --region us-east-2
+                    '''
                 }
             }
             stage('triggering the Downstream job for Deploying'){
