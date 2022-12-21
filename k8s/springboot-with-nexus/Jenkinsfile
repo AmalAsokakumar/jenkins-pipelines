@@ -2,9 +2,9 @@ pipeline{
     agent any
     tools{
         maven "maven"
-         registry = "public.ecr.aws/z2t0b6v5/spring-boot"
     }
     environment{
+            registry = "public.ecr.aws/z2t0b6v5/spring-boot"
             def pipelineA = 'k8sDeployment'
             def APPVERSION = ''
     }
