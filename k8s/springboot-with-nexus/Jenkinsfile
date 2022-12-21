@@ -110,28 +110,42 @@ pipeline{
             stage('Versioning and building nexus artifact, pusing it into ECR'){
                 steps{
                     sh '''
-                        sed -i "s/version:.*/version: $BUILD_NUMBER/" helm/helmchart/Chart.yaml
-                        helm package helm/helmchart
+                        sed -i "s/version:.*/version: $BUILD_NUMBER/" helm/helmcharts/Chart.yaml
+                        helm package helm/helmcharts
                     '''
                     // helm push helmchart-1-$BUILD_NUMBER.tgz oci://public.ecr.aws/z2t0b6v5/helm/
                 }
             }
-            stage('Pushing Helm package into ECR'){
+            stage('Pushing Helm package into ECR - Private_repo'){
                 steps{
                     sh '''
-                        aws ecr-public get-login-password \
+                    aws ecr get-login-password \
                                 --region us-east-1 | helm registry login \
                                 --username AWS \
-                                --password-stdin public.ecr.aws/z2t0b6v5/helmchart
+                                --password-stdin 345325264898.dkr.ecr.us-east-2.amazonaws.com
                     '''
-                    sh ' helm push helmchart-1-$BUILD_NUMBER.tgz oci://public.ecr.aws/z2t0b6v5' 
-                    sh '''
-                        aws ecr-public describe-images \
-                                --repository-name helmchart \
-                                --region us-east-1
-                    '''
+                    sh ' helm push helmcharts-1-$BUILD_NUMBER.tgz oci://345325264898.dkr.ecr.us-east-2.amazonaws.com'
+                    
                 }
             }
+            // stage('Pushing Helm package into ECR'){
+            //     steps{
+            //         sh '''
+            //             aws ecr-public get-login-password \
+            //                     --region us-east-1 | helm registry login \
+            //                     --username AWS \
+            //                     --password-stdin public.ecr.aws/z2t0b6v5/helmchart
+            //         '''
+            //         sh ' helm push helmchart-1-$BUILD_NUMBER.tgz oci://public.ecr.aws/z2t0b6v5' 
+            //         sh '''
+            //             aws ecr-public describe-images \
+            //                     --repository-name helmchart \
+            //                     --region us-east-1
+            //         '''
+            //     }
+            // }
+
+
             stage('triggering the Downstream job for Deploying'){
                 steps{
                     // Use the build step to invoke pipeline A asynchronously//
