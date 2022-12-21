@@ -22,7 +22,7 @@ pipeline {
         stage('Extracting the files'){
             steps{
                 sh '''
-                    helm install --dry-run helmchart-1-0.1.0.tgz
+                    helm install --name test_deployment --dry-run helmchart-1-0.1.0.tgz
                     helm install helmchart-1-0.1.0.tgz --debug
                 '''
                 // sh '''
