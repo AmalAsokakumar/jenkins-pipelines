@@ -112,14 +112,14 @@ pipeline{
                     sh '''
                         sed -i "s/version:.*/version: $BUILD_NUMBER/" helm/helmchart/Chart.yaml
                         helm package helm/helmchart
-                        helm push helmchart-1-$BUILD_NUMBER.tgz oci://public.ecr.aws/z2t0b6v5/spring-boot
+                        helm push helmchart-1-$BUILD_NUMBER.tgz oci://public.ecr.aws/z2t0b6v5/helm/
                     '''
                 }
             }
             stage('triggering the Downstream job for Deploying'){
                 steps{
                     // Use the build step to invoke pipeline A asynchronously//
-                    build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}")], wait: false
+                    build job: "${env.pipelineA}", parameters: [string (name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}")], wait: false
                     // build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}"), string(name: 'APPVERSION', value: '${appVersion}')], wait: false 
                 }
             }
