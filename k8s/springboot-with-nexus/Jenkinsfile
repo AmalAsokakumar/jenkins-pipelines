@@ -2,6 +2,7 @@ pipeline{
     agent any
     tools{
         maven "maven"
+         registry = "public.ecr.aws/z2t0b6v5/spring-boot"
     }
     environment{
             def pipelineA = 'k8sDeployment'
@@ -53,49 +54,82 @@ pipeline{
                 sh 'mvn package'
                 }
             }
-            stage("Build Image") {
-                steps{
-                    echo 'building docker image '
-                    sh 'docker build -t 18.188.220.54:8083/maven-app:$BUILD_NUMBER .'
-                    echo 'doker login '
-                }
-            }
-            stage('Pushing the image to Nexus'){
-                steps{
-                    withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
-                        sh '''
-                            docker login -u admin -p $password 18.188.220.54:8083
-                            docker push 18.188.220.54:8083/maven-app:$BUILD_NUMBER
-                            docker rmi 18.188.220.54:8083/maven-app:$BUILD_NUMBER
-                        '''
+            // stage("Build Image for nexus") {
+            //     steps{
+            //         echo 'building docker image '
+            //         sh 'docker build -t 18.188.220.54:8083/maven-app:$BUILD_NUMBER .'
+            //         echo 'doker login '
+            //     }
+            // }
+            stage("Building image for ECR"){
+                stage{
+                    script{
+                        docker.build registry
                     }
                 }
             }
-            stage('Building Helm artifact, versioning it and pushing it in to Nexus'){
-                steps{
-                    withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
+            // stage('Pushing the image to Nexus'){
+            //     steps{
+            //         withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
+            //             sh '''
+            //                 docker login -u admin -p $password 18.188.220.54:8083
+            //                 docker push 18.188.220.54:8083/maven-app:$BUILD_NUMBER
+            //                 docker rmi 18.188.220.54:8083/maven-app:$BUILD_NUMBER
+            //             '''
+            //         }
+            //     }
+            // }
+            stage("pushing image to ecr"){
+                stage{
                     sh '''
-                        helm package helm/helmchart
-                        curl -u admin:$password http://18.188.220.54:8081/repository/helm-repo/ --upload-file helmchart-1-0.1.0.tgz -v
+                        aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/z2t0b6v5
+                        docker push public.ecr.aws/z2t0b6v5/spring-boot:$BUILD_NUMBER
                     '''
-                        // sh '''
-                        //     chmod 777 helm
-                        //     tar -czvf test.tgz helm/
-                        //     tar -tvf test.tgz
-                        //     helmVersion=$(helm show chart ./helm/helmchart | grep version: | cut -d ":" -f2 | tr -d " ")
-                        //     tar -czvf myapp-${helmVersion}.tgz helm/
-                        //     ls -lsh
-                        //     tar xvf myapp-${helmVersion}.tgz
-                        //     curl -u admin:$password http://18.188.220.54:8081/repository/helm-repo/ --upload-file myapp-${helmVersion}.tgz -v
-                        // '''
-                    }
+                }
+            }
+            stage('Discribing the details of the repository'){
+                steps{
+                    sh '''
+                        aws ecr describe-images \
+                            --repository-name spring-boot \
+                            --region us-east-2
+                    '''
+                }
+            }
+            // stage('Building Helm artifact, versioning it and pushing it in to Nexus'){
+            //     steps{
+            //         withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
+            //         sh '''
+            //             helm package helm/helmchart
+            //             curl -u admin:$password http://18.188.220.54:8081/repository/helm-repo/ --upload-file helmchart-1-0.1.0.tgz -v
+            //         '''
+            //             // sh '''
+            //             //     chmod 777 helm
+            //             //     tar -czvf test.tgz helm/
+            //             //     tar -tvf test.tgz
+            //             //     helmVersion=$(helm show chart ./helm/helmchart | grep version: | cut -d ":" -f2 | tr -d " ")
+            //             //     tar -czvf myapp-${helmVersion}.tgz helm/
+            //             //     ls -lsh
+            //             //     tar xvf myapp-${helmVersion}.tgz
+            //             //     curl -u admin:$password http://18.188.220.54:8081/repository/helm-repo/ --upload-file myapp-${helmVersion}.tgz -v
+            //             // '''
+            //         }
+            //     }
+            // }
+            stage('Versioning and building nexus artifact, pusing it into Nexus'){
+                steps{
+                    sh '''
+                        sed 's/version:.*/version: $BUILD_NUMBER/' helm/helmchart/Chart.yaml
+                        helm package helm/helmchart
+                        helm push helm-test-chart-0.1.0.tgz oci://public.ecr.aws/z2t0b6v5/spring-boot/:$BUILD_NUMBER
+                    '''
                 }
             }
             stage('triggering the Downstream job for Deploying'){
                 steps{
                     // Use the build step to invoke pipeline A asynchronously//
                     build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}")], wait: false
-                    // build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}"), string(name: 'APPVERSION', value: '${appVersion}')], wait: false
+                    // build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}"), string(name: 'APPVERSION', value: '${appVersion}')], wait: false 
                 }
             }
         }
