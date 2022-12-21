@@ -128,7 +128,7 @@ pipeline{
                                 --password-stdin 345325264898.dkr.ecr.us-east-1.amazonaws.com
                     '''
                     // sh ' helm push helmcharts-$BUILD_NUMBER.tgz oci://345325264898.dkr.ecr.us-east-1.amazonaws.com'
-                      sh ' helm push helmcharts*.tgz oci://345325264898.dkr.ecr.us-east-2.amazonaws.com/helmcharts'
+                      sh ' helm push helmcharts*.tgz oci://345325264898.dkr.ecr.us-east-1.amazonaws.com/helmcharts'
                       
 
                 }
