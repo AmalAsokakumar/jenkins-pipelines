@@ -124,7 +124,7 @@ pipeline{
                                 --username AWS \
                                 --password-stdin 345325264898.dkr.ecr.us-east-1.amazonaws.com
                     '''
-                    sh ' helm push helmchart-1-$BUILD_NUMBER.tgz oci://345325264898.dkr.ecr.us-east-1.amazonaws.com'
+                    sh ' helm push helmcharts-1-$BUILD_NUMBER.tgz oci://345325264898.dkr.ecr.us-east-1.amazonaws.com'
 
                 }
             }
