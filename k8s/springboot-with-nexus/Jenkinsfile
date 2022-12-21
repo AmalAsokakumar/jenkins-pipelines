@@ -122,10 +122,10 @@ pipeline{
                     aws ecr get-login-password \
                                 --region us-east-1 | helm registry login \
                                 --username AWS \
-                                --password-stdin 345325264898.dkr.ecr.us-east-2.amazonaws.com
+                                --password-stdin 345325264898.dkr.ecr.us-east-1.amazonaws.com
                     '''
-                    sh ' helm push helmcharts-1-$BUILD_NUMBER.tgz oci://345325264898.dkr.ecr.us-east-2.amazonaws.com'
-                    
+                    sh ' helm push helmcharts-1-$BUILD_NUMBER.tgz oci://345325264898.dkr.ecr.us-east-1.amazonaws.com'
+
                 }
             }
             // stage('Pushing Helm package into ECR'){
