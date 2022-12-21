@@ -4,7 +4,7 @@ pipeline{
         maven "maven"
     }
     environment{
-            registry = "public.ecr.aws/z2t0b6v5/spring-boot"
+            registry = "public.ecr.aws/z2t0b6v5/spring-boot:$BUILD_NUMBER"
             def pipelineA = 'k8sDeployment'
             def APPVERSION = ''
     }
