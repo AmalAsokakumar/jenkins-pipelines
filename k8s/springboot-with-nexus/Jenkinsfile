@@ -76,7 +76,7 @@ pipeline{
                     withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
                     sh '''
                         helm package helm/helmchart
-                        curl -u admin:$password http://18.188.220.54:8081/repository/helm-repo/ --upload-file helm-repo-0.1.0.tgz -v
+                        curl -u admin:$password http://18.188.220.54:8081/repository/helm-repo/ --upload-file helm/helmchart-1-0.1.0.tgz -v
                     '''
                         // sh '''
                         //     chmod 777 helm

@@ -13,17 +13,17 @@ pipeline {
                     withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
                         sh '''
                             docker login -u admin -p $password 18.188.220.54:8083
-                            docker pull 18.188.220.54:8083/maven-app:$BUILD_NUMBER_
-                            curl -u admin:$password -O http://18.188.220.54:8081/repository/helm-hosted/helm-repo-0.1.0.tgz
+                            curl -u admin:$password -O http://18.188.220.54:8081/repository/helm-hosted/helmchart-1-0.1.0.tgz
                         '''
+                        //  docker pull 18.188.220.54:8083/maven-app:$BUILD_NUMBER_  to pull file form the nexus repo
                     }
             }
         }
         stage('Extracting the files'){
             steps{
                 sh '''
-                    helm install --dry-run mychart-0.1.0.tgz
-                    helm install mychart-0.1.0.tgz --debug
+                    helm install --dry-run helmchart-1-0.1.0.tgz
+                    helm install helmchart-1-0.1.0.tgz --debug
                 '''
                 // sh '''
                 //     file myapp-${params.APPVERSION}.tgz 
