@@ -118,6 +118,7 @@ pipeline{
             }
             stage('Pushing Helm package into ECR'){
                 steps{
+                    aws ecr get-login-password --region ap-northeast-1 | helm registry login --username AWS --password-stdin 266454083192.dkr.ecr.ap-northeast-1.amazonaws.com'
                     sh '''
                         aws ecr-public get-login-password \
                                 --region us-east-2 | helm registry login \
