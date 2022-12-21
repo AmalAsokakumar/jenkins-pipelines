@@ -62,7 +62,7 @@ pipeline{
             //     }
             // }
             stage("Building image for ECR"){
-                stage{
+                steps{
                     script{
                         docker.build registry
                     }
@@ -80,7 +80,7 @@ pipeline{
             //     }
             // }
             stage("pushing image to ecr"){
-                stage{
+                steps{
                     sh '''
                         aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/z2t0b6v5
                         docker push public.ecr.aws/z2t0b6v5/spring-boot:$BUILD_NUMBER
