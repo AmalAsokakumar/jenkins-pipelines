@@ -66,12 +66,12 @@ pipeline{
                 sh 'docker push public.ecr.aws/z2t0b6v5/maven-artifact:$BUILD_NUMBER'
             }
         }
-        // stage ('deploying the spring boot application in k8s'){
-        //     steps{
-        //         withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'istio-secret-file', namespace: '', serverUrl: '') {
-        //             sh 'kubectl apply -f eks-deploy-k8s.yaml'
-        //         }
-        //     }
-        // }
+        stage ('deploying the spring boot application in k8s'){
+            steps{
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'istio-secret-file', namespace: '', serverUrl: '') {
+                    sh 'kubectl apply -f eks-deploy-k8s.yaml'
+                }
+            }
+        }
     }
 }
