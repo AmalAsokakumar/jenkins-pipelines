@@ -24,9 +24,9 @@ pipeline{
             }
             stage("Quality Gate") {
                 steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
+                    timeout(time: 5, unit: 'MINUTES') {
+                        waitForQualityGate abortPipeline: true
+                    }
                 }
             }
             stage('unit test'){
@@ -117,20 +117,20 @@ pipeline{
                     '''                   
                 }
             }
-            // stage('Pushing Helm package into ECR - Private_repo'){
-            //     steps{
-            //         sh '''
-            //         aws ecr get-login-password \
-            //                     --region us-east-1 | helm registry login \
-            //                     --username AWS \
-            //                     --password-stdin 345325264898.dkr.ecr.us-east-1.amazonaws.com
-            //         '''
-            //         // sh ' helm push helmcharts-$BUILD_NUMBER.tgz oci://345325264898.dkr.ecr.us-east-1.amazonaws.com'
-            //           sh ' helm push helmcharts*.tgz oci://345325264898.dkr.ecr.us-east-1.amazonaws.com/helmcharts'
-                      
+                // stage('Pushing Helm package into ECR - Private_repo'){
+                //     steps{
+                //         sh '''
+                //         aws ecr get-login-password \
+                //                     --region us-east-1 | helm registry login \
+                //                     --username AWS \
+                //                     --password-stdin 345325264898.dkr.ecr.us-east-1.amazonaws.com
+                //         '''
+                //         // sh ' helm push helmcharts-$BUILD_NUMBER.tgz oci://345325264898.dkr.ecr.us-east-1.amazonaws.com'
+                //           sh ' helm push helmcharts*.tgz oci://345325264898.dkr.ecr.us-east-1.amazonaws.com/helmcharts'
+                        
 
-            //     }
-            // }
+                //     }
+                // }
                                 // stage('Pushing Helm package into ECR'){
                                 //     steps{
                                 //         sh '''
@@ -149,12 +149,12 @@ pipeline{
                                 // }
 
 
-        //     stage('triggering the Downstream job for Deploying'){
-        //         steps{
-        //             // Use the build step to invoke pipeline A asynchronously//
-        //             build job: "${env.pipelineA}", parameters: [string (name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}")], wait: false
-        //             // build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}"), string(name: 'APPVERSION', value: '${appVersion}')], wait: false 
-        //         }
-        //     }
+                //     stage('triggering the Downstream job for Deploying'){
+                //         steps{
+                //             // Use the build step to invoke pipeline A asynchronously//
+                //             build job: "${env.pipelineA}", parameters: [string (name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}")], wait: false
+                //             // build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}"), string(name: 'APPVERSION', value: '${appVersion}')], wait: false 
+                //         }
+                //     }
             }
     }
