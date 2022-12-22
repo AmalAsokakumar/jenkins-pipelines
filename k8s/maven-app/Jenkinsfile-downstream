@@ -1,0 +1,28 @@
+pipeline{
+    agent any
+    tools{
+        maven 'maven'
+    }
+    parameters {
+        string(name: 'BUILD_NUMBER_', defaultValue: '', description: 'To version the docker image')
+    }
+    stages{
+        stage ("cloning git repo"){
+            steps{
+                echo 'here am cloning git repo because helmfile failed to push'
+            }
+        }
+        stage ('Editing the image version'){
+            steps {
+                sh "sed -i 's/latest/$BUILD_NUMBER_/' eks-deploy-k8s.yaml"
+            }
+        }
+        stage ('deploying the spring boot application in k8s'){
+            steps{
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'istio-secret-file', namespace: '', serverUrl: '') {
+                    sh 'kubectl apply -f eks-deploy-k8s.yaml'
+                }
+            }
+        }
+    }
+}
