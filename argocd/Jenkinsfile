@@ -1,0 +1,45 @@
+pipeline{ 
+    agent any 
+    tools{
+        maven "maven"
+    }
+    stages{
+        stage("cloning git repo"){
+            steps{
+                echo "====++++executing cloning git repo++++===="
+                git branch: 'main', url: 'https://github.com/comrider/argo-demo.git' // git repo needed to be created. 
+            }
+            post{
+                always{
+                
+                git    echo "====++++always++++===="
+                }
+                success{
+                    echo "====++++cloning git repo executed successfully++++===="
+                }
+                failure{
+                    echo "====++++cloning git repo execution failed++++===="
+                }
+        
+            }
+        }
+        stage('building'){
+            steps{
+                    echo "packaging the artifact"
+                    sh '''
+                        helm package helm 
+                        ls -lrt
+                    '''
+            }
+        }
+        stage('login and pushing artifact into ECR (helm file)'){
+            steps{
+                sh '''
+                    aws ecr get-login-password --region us-east-2 | helm registry login --username AWS --password-stdin 345325264898.dkr.ecr.us-east-2.amazonaws.com
+                    helm push helm*.tgz oci://345325264898.dkr.ecr.us-east-2.amazonaws.com
+                '''
+            }
+
+        }
+    }
+}

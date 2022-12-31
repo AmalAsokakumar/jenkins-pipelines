@@ -5,20 +5,20 @@ pipeline {
         // string(name: 'APPVERSION', defaultValue: 'error', description: 'To version helm image' )
     }
     stages {
-        // stage('Pulling the Artifact for Nexus') {
-        //     // steps {
-        //     //     cleanWs()
-        //     //     echo "Build number: $params.BUILD_NUMBER_"
-        //     //     // echo "Helm version: $params.APPVERSION"
-        //     //         withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
-        //     //             sh '''
-        //     //                 docker login -u admin -p $password 18.188.220.54:8083
-        //     //                 curl -u admin:$password -O http://18.188.220.54:8081/repository/helm-hosted/helmchart-1-0.1.0.tgz
-        //     //             '''
-        //     //             //  docker pull 18.188.220.54:8083/maven-app:$BUILD_NUMBER_  to pull file form the nexus repo
-        //     //         }
-        //     // }
-        // }
+        stage('Pulling the Artifact for Nexus') {
+            steps {
+                cleanWs()
+                echo "Build number: $params.BUILD_NUMBER_"
+                // echo "Helm version: $params.APPVERSION"
+                    withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
+                        sh '''
+                            docker login -u admin -p $password 18.188.220.54:8083
+                            curl -u admin:$password -O http://18.188.220.54:8081/repository/helm-hosted/helmchart-1-0.1.0.tgz
+                        '''
+                        //  docker pull 18.188.220.54:8083/maven-app:$BUILD_NUMBER_  to pull file form the nexus repo
+                    }
+            }
+        }
         stage("pulling the artifact from ECR"){
             steps{
                 sh '''
