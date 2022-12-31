@@ -7,12 +7,13 @@ pipeline{
         stage("cloning git repo"){
             steps{
                 echo "====++++executing cloning git repo++++===="
+                cleanWs()
                 git branch: 'main', url: 'https://github.com/comrider/argo-demo.git' // git repo needed to be created. 
             }
             post{
                 always{
                 
-                git    echo "====++++always++++===="
+                    echo "====++++always++++===="
                 }
                 success{
                     echo "====++++cloning git repo executed successfully++++===="
