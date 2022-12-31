@@ -37,6 +37,7 @@ pipeline{
                 sh '''
                     aws ecr get-login-password --region us-east-2 | helm registry login --username AWS --password-stdin 345325264898.dkr.ecr.us-east-2.amazonaws.com
                     helm push helm*.tgz oci://345325264898.dkr.ecr.us-east-2.amazonaws.com
+                    aws ecr describe-images --repository-name helm --region us-east-2 
                 '''
             }
 
