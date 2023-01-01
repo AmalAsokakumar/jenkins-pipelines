@@ -6,14 +6,12 @@ pipeline{
     stages{
         stage("cloning git repo"){
             steps{
-                echo "====++++executing cloning git repo++++===="
                 cleanWs()
                 git branch: 'main', url: 'https://github.com/comrider/argo-demo.git' // git repo needed to be created. 
             }
             post{
                 always{
-                
-                    echo "====++++always++++===="
+                    echo "====++++executing cloning git repo++++===="
                 }
                 success{
                     echo "====++++cloning git repo executed successfully++++===="
@@ -21,7 +19,6 @@ pipeline{
                 failure{
                     echo "====++++cloning git repo execution failed++++===="
                 }
-        
             }
         }
         stage('building'){
@@ -30,6 +27,7 @@ pipeline{
                     sh '''
                         helm package helm 
                         ls -lrt
+                        tar -xvf helm*.tgz
                     '''
             }
         }
