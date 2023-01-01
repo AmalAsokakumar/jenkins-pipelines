@@ -28,6 +28,7 @@ pipeline{
                         helm package helm 
                         ls -lrt
                         tar -xvf helm*.tgz
+                        tree .
                     '''
             }
         }
