@@ -37,24 +37,30 @@ Once the installation is complete, SonarQube will start automatically. we can ve
 
 Another option for installing SonarQube is to use Docker. This is a good choice if we don't want to install SonarQube directly on our system, or if we want to quickly set up a test instance.
 
-To install Docker on Ubuntu, follow the instructions on the [Docker](https://docs.docker.com/engine/install/ubuntu/).
+To install Docker on Ubuntu, follow the instructions on the [Docker](https://github.com/comrider/jenkins-pipelines/blob/main/installation%20notes/Docker.MD).
 
-Once Docker is installed, you can pull the SonarQube Docker image and run it with the following commands:
+Once Docker is installed, we can pull the SonarQube Docker image and run it with the following commands:
 
-Copy code
+```
 docker pull sonarqube
 docker run -d --name sonarqube -p 9000:9000 sonarqube
-This will start a SonarQube container and expose it on port 9000. You can verify that it is running by visiting http://localhost:9000 in your web browser. The default login is admin with a password of admin.
+```
+This will start a SonarQube container and expose it on port 9000. We can verify that it is running by visiting `http://localhost:9000` in our web browser. The default login is` admin with a password of admin`.
 
-3. Building from source
+### 3. Building from source
 
-If you want to build SonarQube from source, you can follow these instructions:
+ To build SonarQube from source, follow these instructions:
 
 Download the latest version of SonarQube from the official website.
 Extract the downloaded archive:
-Copy code
+
+```
 tar xzf sonarqube-*.tar.gz
+```
+
 Navigate to the extracted directory:
-Copy code
+
+```
 cd sonarqube-*
 Start Son
+```
