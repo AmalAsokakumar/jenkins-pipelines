@@ -66,13 +66,6 @@ pipeline{
                 sh 'docker push public.ecr.aws/z2t0b6v5/maven-artifact:$BUILD_NUMBER'
             }
         }
-        // stage ('deploying the spring boot application in k8s'){
-        //     steps{
-        //         withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'istio-secret-file', namespace: '', serverUrl: '') {
-        //             sh 'kubectl apply -f eks-deploy-k8s.yaml'
-        //         }
-        //     }
-        // }
         stage('triggering the Downstream job for Deploying'){
             steps{
                 build job: "${env.pipelineA}", parameters: [string (name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}")], wait: false

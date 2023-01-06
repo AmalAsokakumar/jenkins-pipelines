@@ -1,44 +1,39 @@
-this is a simple java maven application. 
+# A Jenkins pipeline job which integrates with AWS ECR, EC2 and EKS
+
+This repository contains two Jenkins pipeline jobs `Jenkins` and `Jenkins-downstream` . This Jenkins job is used to build a spring boot application  
+
+1. Job1 - To Building a Docker image form a [Spring boot application](https://github.com/comrider/springboot-app.git) and push it into AWS ECR.
+2. Job2 -To Deploy the Docker image into AWS EKS.
+
+## Prerequisites
+
+Before using this pipeline, you will need to have the following resources available:
+
+- Jenkins server with the following plugins installed:
+  - [Parameterized Trigger](https://plugins.jenkins.io/parameterized-trigger/)
+  - [Maven Integration](https://plugins.jenkins.io/maven-plugin/)
+  - [Kubernetes CLI](https://plugins.jenkins.io/kubernetes-cli/)
+  - [SonarQube Scanner](https://plugins.jenkins.io/sonar/)
+  - [Workspace Cleanup](https://plugins.jenkins.io/ws-cleanup/)
+  - [Docker](https://plugins.jenkins.io/docker-plugin/)
+  - [Docker Pipeline](https://plugins.jenkins.io/docker-workflow/)
 
 
-pipeline{
-    agent any
-    tools{
-        maven "maven"
-    }
-    environment{
-        registry = "public.ecr.aws/z2t0b6v5/maven-artifact"
-    }
-    stages{
-        stage ('SCM checkout'){
-            steps{
-                git branch: 'main', url: 'https://github.com/comrider/springboot-app.git'
-            }
-        }
-        stage('build jar file'){
-            steps{
-                sh 'mvn clean install '
-            }
-        }
-        stage('buid docker image'){
-            steps{
-                script {
-                    docker.build registry                 
-                }
-            }
-        }
-        stage ('Push into ECR'){
-            steps{
-                sh 'aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/z2t0b6v5'
-                sh 'docker push public.ecr.aws/z2t0b6v5/maven-artifact:latest'
-            }
-        }
-        stage ('deploying the spring boot application in k8s'){
-            steps{
-                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'istio-secret-file', namespace: '', serverUrl: '') {
-                    sh 'kubectl apply -f eks-deploy-k8s.yaml'
-                }
-            }
-        }
-    }
-}
+
+## Configuration
+
+To use this pipeline, you will need to do the following:
+
+1. first you need to setup two AWS EC2 instances
+2. install Jenkins in one aws EC2 instance we can name it as Jenkins instance. 
+
+## Running the Pipeline
+
+To run the pipeline, follow these steps:
+
+1. [Add steps for triggering the pipeline here]
+2. [Include any additional steps needed to run the pipeline]
+
+## Additional Information
+
+[Include any additional information or notes about the pipeline here]
