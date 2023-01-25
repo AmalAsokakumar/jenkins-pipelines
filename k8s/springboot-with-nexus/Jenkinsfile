@@ -54,13 +54,24 @@ pipeline{
                 sh 'mvn package'
                 }
             }
-            // stage("Build Image for nexus") {
-            //     steps{
-            //         echo 'building docker image '
-            //         sh 'docker build -t 18.188.220.54:8083/maven-app:$BUILD_NUMBER .'
-            //         echo 'doker login '
-            //     }
-            // }
+            stage("Build Image for nexus") {
+                steps{
+                    echo 'building docker image '
+                    sh 'docker build -t 18.188.220.54:8083/maven-app:$BUILD_NUMBER .'
+                    echo 'doker login '
+                }
+            }
+            stage('Pushing the image to Nexus'){
+                steps{
+                    withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
+                        sh '''
+                            docker login -u admin -p $password 18.188.220.54:8083
+                            docker push 18.188.220.54:8083/maven-app:$BUILD_NUMBER
+                            docker rmi 18.188.220.54:8083/maven-app:$BUILD_NUMBER
+                        '''
+                    }
+                }
+            }
             stage("Building image for ECR"){
                 steps{
                     script{
@@ -68,18 +79,7 @@ pipeline{
                     }
                 }
             }
-            // stage('Pushing the image to Nexus'){
-            //     steps{
-            //         withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
-            //             sh '''
-            //                 docker login -u admin -p $password 18.188.220.54:8083
-            //                 docker push 18.188.220.54:8083/maven-app:$BUILD_NUMBER
-            //                 docker rmi 18.188.220.54:8083/maven-app:$BUILD_NUMBER
-            //             '''
-            //         }
-            //     }
-            // }
-            stage("pushing image to ecr"){
+            stage("Pushing image in to ECR"){
                 steps{
                     sh '''
                         aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/z2t0b6v5
@@ -87,31 +87,23 @@ pipeline{
                     '''
                 }
             }
-            // stage('Building Helm artifact, versioning it and pushing it in to Nexus'){
-            //     steps{
-            //         withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
-            //         sh '''
-            //             helm package helm/helmchart
-            //             curl -u admin:$password http://18.188.220.54:8081/repository/helm-repo/ --upload-file helmchart-1-0.1.0.tgz -v
-            //         '''
-            //             // sh '''
-            //             //     chmod 777 helm
-            //             //     tar -czvf test.tgz helm/
-            //             //     tar -tvf test.tgz
-            //             //     helmVersion=$(helm show chart ./helm/helmchart | grep version: | cut -d ":" -f2 | tr -d " ")
-            //             //     tar -czvf myapp-${helmVersion}.tgz helm/
-            //             //     ls -lsh
-            //             //     tar xvf myapp-${helmVersion}.tgz
-            //             //     curl -u admin:$password http://18.188.220.54:8081/repository/helm-repo/ --upload-file myapp-${helmVersion}.tgz -v
-            //             // '''
-            //         }
-            //     }
-            // }
-            stage('Versioning and building nexus artifact, pusing it into ECR'){
+            stage('Building Helm Chart, versioning it and pushing it in to Nexus'){
+                steps{
+                    withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
+                        sh '''
+                            cat ./helm/helmcharts/Chart.yaml
+                            sed -i 's/version:*/version: $BUILD_NUMBER/' ./helm/helmcharts/Chart.yaml
+                            helm package helm/helmcharts
+                            curl -u admin:$password http://18.188.220.54:8081/repository/helm-repo/ --upload-file myapp-${helmVersion}.tgz -v
+                        '''
+                    }
+                }
+            }
+            stage('Versioning and building Helm Chart, pusing it into ECR'){
                 steps{
                     sh '''
-     
                         cat ./helm/helmcharts/Chart.yaml
+                        sed -i 's/version:*/version: $BUILD_NUMBER/ ' ./helm/helmcharts/Chart.yaml
                         helm package helm/helmcharts
                         ls -lrt
                     '''                   
@@ -120,7 +112,7 @@ pipeline{
                 // stage('Pushing Helm package into ECR - Private_repo'){
                 //     steps{
                 //         sh '''
-                //         aws ecr get-login-password \
+                //         aws ecr get-login-password 
                 //                     --region us-east-1 | helm registry login \
                 //                     --username AWS \
                 //                     --password-stdin 345325264898.dkr.ecr.us-east-1.amazonaws.com
@@ -149,12 +141,11 @@ pipeline{
                                 // }
 
 
-                //     stage('triggering the Downstream job for Deploying'){
-                //         steps{
-                //             // Use the build step to invoke pipeline A asynchronously//
-                //             build job: "${env.pipelineA}", parameters: [string (name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}")], wait: false
-                //             // build job: "${env.pipelineA}", parameters: [string(name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}"), string(name: 'APPVERSION', value: '${appVersion}')], wait: false 
-                //         }
-                //     }
+            stage('triggering the Downstream job for Deploying'){
+                steps{
+                    // Use the build step to invoke pipeline A asynchronously//
+                    build job: "${env.pipelineA}", parameters: [string (name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}")], wait: false
+                }
             }
+        }
     }

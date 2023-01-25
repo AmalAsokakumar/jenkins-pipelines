@@ -1,1 +1,1 @@
-this a read me md file for this project which should be updated soon. 
+this is a aws some porogramming that i am writhing in recent datys 

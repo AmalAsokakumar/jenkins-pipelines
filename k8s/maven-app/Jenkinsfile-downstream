@@ -9,7 +9,6 @@ pipeline{
     stages{
         stage ("cloning git repo"){
             steps{
-                echo 'here am cloning git repo because helmfile failed to push'
                  git branch: 'main', url: 'https://github.com/comrider/springboot-app.git'
             }
         }

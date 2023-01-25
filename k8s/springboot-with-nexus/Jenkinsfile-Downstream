@@ -2,25 +2,25 @@ pipeline {
     agent any
     parameters {
         string(name: 'BUILD_NUMBER_', defaultValue: '', description: 'To version the docker image')
-        // string(name: 'APPVERSION', defaultValue: 'error', description: 'To version helm image' )
     }
     stages {
         stage('Pulling the Artifact for Nexus') {
             steps {
                 cleanWs()
                 echo "Build number: $params.BUILD_NUMBER_"
-                // echo "Helm version: $params.APPVERSION"
+                echo "Helm version: $params.APPVERSION"
                     withCredentials([string(credentialsId: 'nexus-password', variable: 'password')]) {
                         sh '''
                             docker login -u admin -p $password 18.188.220.54:8083
-                            curl -u admin:$password -O http://18.188.220.54:8081/repository/helm-hosted/helmchart-1-0.1.0.tgz
+                            curl -u admin:$password -o helmchart http://18.188.220.54:8081/repository/helm-hosted/helmchart-1-0.1.0.tgz
                         '''
-                        //  docker pull 18.188.220.54:8083/maven-app:$BUILD_NUMBER_  to pull file form the nexus repo
+                        //  docker pull 18.188.220.54:8083/maven-app:$BUILD_NUMBER_  //to pull file form the nexus repo
                     }
             }
         }
         stage("pulling the artifact from ECR"){
             steps{
+                // this stage is not used 
                 sh '''
                 docker pull aws_account_id.dkr.ecr.us-west-2.amazonaws.com/amazonlinux:latest
                 ''' 
@@ -29,28 +29,20 @@ pipeline {
         stage('Extracting the files'){
             steps{
                 sh '''
-                    tar tvf helmchart-1-0.1.0.tgz
-                    tar xvf helmchart-1-0.1.0.tgz
-                    helm template -f helmchart-1/value.yaml  helmchart-1
-                    helm lint -f helmchart-1/value.yaml  helmchart-1 
-                    helm install -f helmchart-1/value.yaml  helmchart-1 --debug
+                    tar tvf helmchart.tgz
+                    tar xvf helmchart.tgz
+                    helm template -f helmchart/value.yaml  helmchart
+                    helm lint -f helmchart/value.yaml  helmchart 
+                    helm install -f helmchart/value.yaml  helmchart --debug
                 '''
-                // sh '''
-                //     file myapp-${params.APPVERSION}.tgz 
-                //     ls -lrsh 
-                //     tar xvf myapp-${params.APPVERSION}.tgz 
-                //     ls -lrsh 
-                // '''
             }
         }
-        // stage('Editing the image version'){
-        //     steps{
-        //         echo "testing"
-        //         // sh '''
-        //         //     helm template -f helm/deployment.yaml helm/helmchart
-        //         //     helm lint -f helm/deployment.yaml helm/helmchart
-        //         // '''
-        //     }
-        // }
+        stage ('deploying the spring boot application in k8s'){
+            steps{
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'istio-secret-file', namespace: '', serverUrl: '') {
+                    sh 'helm install myrelease -f helmchart/value.yaml  helmchart'
+                }
+            }
+        }
     }
 }

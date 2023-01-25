@@ -3,10 +3,6 @@ pipeline{
     tools{
         maven "maven"
     }
-    environment{
-        registry = "public.ecr.aws/z2t0b6v5/maven-artifact:$BUILD_NUMBER"
-        def pipelineA = 'Downstream'
-    }
     stages{
         stage ('SCM checkout'){
             steps{
@@ -51,24 +47,6 @@ pipeline{
         stage('build jar file'){
             steps{
                 sh 'mvn clean install '
-            }
-        }
-        stage('buid docker image'){
-            steps{
-                script {
-                    docker.build registry                 
-                }
-            }
-        }
-        stage ('Push into ECR'){
-            steps{
-                sh 'aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/z2t0b6v5'
-                sh 'docker push public.ecr.aws/z2t0b6v5/maven-artifact:$BUILD_NUMBER'
-            }
-        }
-        stage('triggering the Downstream job for Deploying'){
-            steps{
-                build job: "${env.pipelineA}", parameters: [string (name: 'BUILD_NUMBER_', value: "${BUILD_NUMBER}" )], wait: false
             }
         }
     }
